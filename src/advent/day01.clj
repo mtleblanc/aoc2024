@@ -5,7 +5,7 @@
 (defn read-columns [file-path]
   (with-open [rdr (io/reader file-path)]
     (let [lines (doall (line-seq rdr))
-          columns (map #(str/split % #"   ") lines)
+          columns (map #(str/split % #"\s+") lines)
           col1 (map #(Integer/parseInt (first %)) columns)
           col2 (map #(Integer/parseInt (second %)) columns)]
       {:col1 (vec col1) :col2 (vec col2)})))
@@ -20,13 +20,13 @@
        (map #(vector (first %) (f (second %))))
        (into {})))
 
-(defn my-frequnecies [v]
+(defn my-frequencies [v]
   (->> v
        (group-by identity)
        (map-values count)))
 
 (defn similarity-score [v1 v2]
-  (let [counts (my-frequnecies v2)]
+  (let [counts (frequencies v2)]
     (->> v1
          (map #(* % (get counts % 0)))
          (reduce +))))
