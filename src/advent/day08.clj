@@ -25,37 +25,36 @@
     (and (>= x 0) (< x rows)
          (>= y 0) (< y cols))))
 
-(defn all-nodes [rows cols v w]
-  (if (= v w) #{}
-      (let [d-orig (diff v w)
-            g (apply gcd d-orig)
-            d (mapv #(/ % g) d-orig)
-            v? (in-bounds rows cols)]
-        (->> v (iterate #(sum d %))
-             (take-while v?)
-             set))))
+(defn all-nodes [v? v w]
+  (let [d-orig (diff v w)
+        g (apply gcd d-orig)
+        d (mapv #(/ % g) d-orig)]
+    (->> v (iterate #(sum d %))
+         (take-while v?)
+         set)))
 
+(defn part-1 [input]
+  (let [grid (parse-input input)
+        groups (vals (to-sparse grid))
+        rows (count grid)
+        cols (count (grid 0))
+        v? (in-bounds rows cols)]
+    (->> groups
+         (mapcat #(for [c % d % :when (not= c d)] (node c d)))
+         (set)
+         (filter v?)
+         (count))))
 
-(defn part-1 [input] (let [grid (parse-input input)]
-                       (->>
-                        grid
-                        to-sparse
-                        vals
-                        (mapcat (fn [coords] (for [c coords d coords] (if (not= c d) (node c d)))))
-                        (remove nil?)
-                        (set)
-                        (filter (in-bounds (count grid) (count (grid 0))))
-                        (count))))
-
-(defn part-2 [input] (let [grid (parse-input input)
-                           rows (count grid)
-                           cols (count (grid 0))]
-                       (->> grid
-                            to-sparse
-                            vals
-                            (mapcat (fn [coords] (for [c coords d coords] (all-nodes rows cols c d))))
-                            (reduce set/union)
-                            count)))
+(defn part-2 [input]
+  (let [grid (parse-input input)
+        groups (vals (to-sparse grid))
+        rows (count grid)
+        cols (count (grid 0))
+        v? (in-bounds rows cols)]
+    (->> groups
+         (mapcat #(for [c % d % :when (not= c d)] (all-nodes v? c d)))
+         (reduce set/union)
+         count)))
 
 (defn -main [& args]
   (let [file-path (first args)
