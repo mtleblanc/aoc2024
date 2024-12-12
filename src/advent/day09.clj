@@ -54,7 +54,7 @@
                                    :else (let [old-gap (first tail)
                                                new-gap (assoc old-gap :length (- (:length old-gap) orig-length) :start (+ (:start old-gap) orig-length))
                                                [tail-head tail-tail] (split-with #(not= orig-id (:id %)) (rest tail))]
-                                           (concat head [(assoc elem :start (:start old-gap)) new-gap] tail-head (rest tail-tail)))))))
+                                           (vec (concat head [(assoc elem :start (:start old-gap)) new-gap] tail-head (rest tail-tail))))))))
 
 (defn tri [n] (if (< n 0) 0 (/ (* n (inc n)) 2)))
 
